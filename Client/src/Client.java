@@ -1,5 +1,3 @@
-import org.apache.xerces.impl.xs.SchemaNamespaceSupport;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;

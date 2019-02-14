@@ -8,40 +8,41 @@ import java.util.Scanner;
 
 public class Server implements Runnable {
 
-    private Socket socket;
-    private ServerSocket serverSocket;
+    private Socket connectLoadBalancer;
 
     public Server(Socket socket) throws Exception {
 //        this.serverSocket = serverSocket;
-        this.socket = socket;
+        this.connectLoadBalancer = socket;
     }
 
     @Override
     public void run() {
-        try {
-            while(true) {
-                // Read in the number sent by the load balancer
-                Scanner sc = new Scanner(socket.getInputStream());
-                int inNum = sc.nextInt();
-                System.out.println(inNum);
-
-                // Double the number and send it back
-                new PrintStream(socket.getOutputStream()).println(inNum * 2);
-            }
-        }
-
-        catch (Exception e) {}
-
-        finally {
+        synchronized(this) {
             try {
-                closeSockets();
-            } catch (IOException e) {}
-            System.out.println("Connection with load balancer closed.");
+                while(connectLoadBalancer.isConnected()) {
+                    // Read in the number sent by the load balancer
+                    Scanner sc = new Scanner(connectLoadBalancer.getInputStream());
+                    int inNum = sc.nextInt();
+                    System.out.println(inNum);
+
+                    // Double the number and send it back
+                    new PrintStream(connectLoadBalancer.getOutputStream()).println(inNum * 2);
+                }
+            }
+
+            catch (Exception e) {}
+
+            finally {
+                try {
+                    closeSockets();
+                } catch (IOException e) {}
+                System.out.println("Connection with load balancer closed.");
+            }
         }
     }
 
     private void closeSockets() throws IOException {
-        socket.close();
+        connectLoadBalancer.close();
     }
 
 //    private void closeServerSocket() throws IOException {
@@ -63,6 +64,7 @@ public class Server implements Runnable {
                 System.out.println("Waiting for the load balancer to connect...");
                 socket = serverSocket.accept();
                 new Thread(new Server(socket)).start();
+                System.out.println("Load balancer connected");
             }
         }
     }
