@@ -7,6 +7,7 @@ import java.util.Scanner;
  */
 public class LoadBalancer implements Runnable {
 
+    private static String SERVERADDRESS = "127.0.0.1";
     private static final int CLIENTPORT = 1341;
     private static final int SERVERPORT = 1342;
     private Socket clientSocket, serverSocket;
@@ -51,7 +52,7 @@ public class LoadBalancer implements Runnable {
 
 
         Socket clientSocket,
-               serverSocket = new Socket("127.0.0.1", SERVERPORT);
+               serverSocket = new Socket(SERVERADDRESS, SERVERPORT);
 
         ServerSocket connection = new ServerSocket(CLIENTPORT);
         clientSocket = connection.accept();
@@ -69,7 +70,7 @@ public class LoadBalancer implements Runnable {
 
             if(clientSocket.isClosed()) {
                 System.out.println("Waiting for client to reconnect");
-                connection = new ServerSocket(CLIENTPORT);
+//                connection = new ServerSocket(CLIENTPORT);
                 clientSocket = connection.accept();
                 new Thread(new LoadBalancer(clientSocket, serverSocket)).start();
             }

@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -8,19 +9,54 @@ import java.util.Scanner;
  */
 
 public class Client {
-    public static void main(String[] args) throws IOException {
 
-        Socket socket = new Socket("127.0.0.1", 1341);
+    public static void main(String[] args) {
 
-        while(true) {
+        String loadBalancerAddress = "127.0.0.1";
+        final int PORT_NUM = 1341;
+
+        InetSocketAddress hostAddress = new InetSocketAddress(loadBalancerAddress, PORT_NUM);
+        Socket socket = new Socket();
+
+        try {
+            socket = connect(socket, hostAddress);
+
+            while(true) {
+                communicate(socket);
+            }
+        } catch (IOException e ) {
+            System.err.println("Error in connecting to the load balancer");
+        }
+    }
+
+    public static Socket connect(Socket s, InetSocketAddress hostAddr) throws IOException {
+        s.connect(hostAddr);
+        return s;
+    }
+
+    public static void sleep(long time) {
+        try {
+            Thread.sleep(time);
+        } catch (InterruptedException e) {
+            System.err.println("Thread was interrupted");
+        }
+    }
+
+    public static void communicate(Socket s) {
+        try {
             // Sending number to server
             System.out.println("Enter a number:");
             int num = new Scanner(System.in).nextInt();
             System.out.println("Your num is: " + num);
-            new PrintStream(socket.getOutputStream()).println(num);
+            new PrintStream(s.getOutputStream()).println(num);
             System.out.println("Waiting on reply...");
             // Receive a reply from the load balancer
-            System.out.println(new Scanner(socket.getInputStream()).nextInt());
+            System.out.println(new Scanner(s.getInputStream()).nextInt());
+        } catch (Exception e) {}
+        finally {
+            try {
+                s.close();
+            } catch (Exception e) {}
         }
     }
 }
