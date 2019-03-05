@@ -53,45 +53,41 @@ public class LoadBalancer implements Runnable {
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
-        Socket clientSocket,
-               serverSocket = new Socket();
+        try {
+            Socket clientSocket,
+                    serverSocket = new Socket();
 
-        InetSocketAddress serverAddress = new InetSocketAddress(SERVERADDRESS, SERVERPORT);
-        serverSocket.connect(serverAddress);
+            InetSocketAddress serverAddress = new InetSocketAddress(SERVERADDRESS, SERVERPORT);
+            serverSocket.connect(serverAddress);
 
-        ServerSocket serverConnection;
-        ServerSocket clientConnection = new ServerSocket(CLIENTPORT);
-        clientSocket = clientConnection.accept();
+            ServerSocket serverConnection;
+            ServerSocket clientConnection = new ServerSocket(CLIENTPORT);
+            clientSocket = clientConnection.accept();
 
-        Thread serverThread = new Thread(new LoadBalancer(clientSocket, serverSocket));
-        serverThread.start();
+            Thread serverThread = new Thread(new LoadBalancer(clientSocket, serverSocket));
+            serverThread.start();
 
-        while(true) {
-            if(serverSocket.isClosed() && clientSocket.isClosed()) {
-                System.out.println("Waiting for the server to reconnect...");
-                serverSocket = new Socket();
-                serverSocket.connect(serverAddress);
+            while(true) {
+                if(serverSocket.isClosed() && clientSocket.isClosed()) {
+                    System.out.println("Waiting for the server to reconnect...");
+                    serverSocket = new Socket();
+                    serverSocket.connect(serverAddress);
 //                serverConnection = new ServerSocket(SERVERPORT);
 //                serverSocket = serverConnection.accept();
-                System.out.println("Server connected");
+                    System.out.println("Server connected");
 
-                System.out.println("Waiting for client to reconnect");
+                    System.out.println("Waiting for client to reconnect");
 //                connection = new ServerSocket(CLIENTPORT);
-                clientSocket = clientConnection.accept();
-                System.out.println("clientSocket.isClosed(): " + clientSocket.isClosed());
+                    clientSocket = clientConnection.accept();
+                    System.out.println("clientSocket.isClosed(): " + clientSocket.isClosed());
 
-                new Thread(new LoadBalancer(clientSocket, serverSocket)).start();
+                    new Thread(new LoadBalancer(clientSocket, serverSocket)).start();
+                }
             }
-
-//            if(clientSocket.isClosed()) {
-//                System.out.println("Waiting for client to reconnect");
-////                connection = new ServerSocket(CLIENTPORT);
-//                clientSocket = clientConnection.accept();
-//                System.out.println("clientSocket.isClosed(): " + clientSocket.isClosed());
-//                new Thread(new LoadBalancer(clientSocket, serverSocket)).start();
-//            }
+        } catch (Exception e) {
+            System.err.println("Exception: " + e.getMessage());
         }
     }
 }
