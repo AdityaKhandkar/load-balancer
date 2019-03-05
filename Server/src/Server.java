@@ -4,6 +4,7 @@
 
 import java.io.*;
 import java.net.*;
+import java.util.Random;
 import java.util.Scanner;
 
 public class Server implements Runnable {
@@ -23,7 +24,7 @@ public class Server implements Runnable {
                     // Read in the number sent by the load balancer
                     Scanner sc = new Scanner(connectLoadBalancer.getInputStream());
                     int inNum = sc.nextInt();
-                    System.out.println(inNum);
+                    System.out.println("Number from load balancer: " + inNum);
 
                     // Double the number and send it back
                     new PrintStream(connectLoadBalancer.getOutputStream()).println(inNum * 2);
@@ -45,6 +46,25 @@ public class Server implements Runnable {
         connectLoadBalancer.close();
     }
 
+    private void randomNumberCruncher() {
+        int n = new Random().nextInt(6) + 5;
+        try {
+            Thread.sleep((new Random().nextInt(n) + 10) * 1000);
+            findNthFib(n*15);
+        } catch (InterruptedException e) {
+            System.err.println("Sleep not working");
+        }
+    }
+
+    private void findNthFib(int n) {
+        int prev = 0, curr = 1;
+        for(int i = 0; i <= n; i++) {
+            int temp = prev + curr;
+            prev = curr;
+            curr = temp;
+        }
+    }
+
 //    private void closeServerSocket() throws IOException {
 //        serverSocket.close();
 //    }
@@ -54,15 +74,15 @@ public class Server implements Runnable {
         final int PORTNUM = 1342;
 
         // Accept the connection
-        ServerSocket serverSocket = new ServerSocket(PORTNUM);
-        Socket socket = serverSocket.accept();
+        ServerSocket balancerSocket = new ServerSocket(PORTNUM);
+        Socket socket = balancerSocket.accept();
         Thread serverThread = new Thread(new Server(socket));
         serverThread.start();
 
         while(true) {
             if(socket.isClosed()) {
                 System.out.println("Waiting for the load balancer to connect...");
-                socket = serverSocket.accept();
+                socket = balancerSocket.accept();
                 new Thread(new Server(socket)).start();
                 System.out.println("Load balancer connected");
             }

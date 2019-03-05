@@ -16,12 +16,14 @@ public class Client {
         final int PORT_NUM = 1341;
 
         InetSocketAddress hostAddress = new InetSocketAddress(loadBalancerAddress, PORT_NUM);
-        Socket socket = new Socket();
+        Socket socket;
 
         try {
-            socket = connect(socket, hostAddress);
-
+            // Make a new request with every loop.
+            // Since its a new object,
             while(true) {
+                socket = new Socket();
+                socket.connect(hostAddress);
                 communicate(socket);
             }
         } catch (IOException e ) {
@@ -53,7 +55,7 @@ public class Client {
             // Receive a reply from the load balancer
             System.out.println(new Scanner(s.getInputStream()).nextInt());
         } catch (Exception e) {}
-        finally {
+        finally { // Always close the socket
             try {
                 s.close();
             } catch (Exception e) {}

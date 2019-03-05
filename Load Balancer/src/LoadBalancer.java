@@ -50,9 +50,10 @@ public class LoadBalancer implements Runnable {
 
     public static void main(String[] args) throws Exception {
 
-
         Socket clientSocket,
                serverSocket = new Socket(SERVERADDRESS, SERVERPORT);
+
+//        InetSocketAddress serverAddress = new InetSocketAddress(SERVERADDRESS, SERVERPORT);
 
         ServerSocket connection = new ServerSocket(CLIENTPORT);
         clientSocket = connection.accept();
