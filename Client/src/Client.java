@@ -20,7 +20,7 @@ public class Client {
 
         try {
             // Make a new request with every loop.
-            // Since its a new object,
+            // Since its a new socket, its a new connection channel
             while(true) {
                 socket = new Socket();
                 socket.connect(hostAddress);
@@ -49,9 +49,8 @@ public class Client {
             // Sending number to server
             System.out.println("Enter a number:");
             int num = new Scanner(System.in).nextInt();
-            System.out.println("Your num is: " + num);
             new PrintStream(s.getOutputStream()).println(num);
-            System.out.println("Waiting on reply...");
+            System.out.println("Waiting for a reply...");
             // Receive a reply from the load balancer
             System.out.println(new Scanner(s.getInputStream()).nextInt());
         } catch (Exception e) {}
