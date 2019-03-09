@@ -31,11 +31,6 @@ public class Client {
         }
     }
 
-    public static Socket connect(Socket s, InetSocketAddress hostAddr) throws IOException {
-        s.connect(hostAddr);
-        return s;
-    }
-
     public static void sleep(long time) {
         try {
             Thread.sleep(time);
@@ -47,12 +42,14 @@ public class Client {
     public static void communicate(Socket s) {
         try {
             // Sending number to server
-            System.out.println("Enter a number:");
-            int num = new Scanner(System.in).nextInt();
+//            System.out.println("Enter a number:");
+//            int num = new Scanner(System.in).nextInt();
+            int num = 10;
+            System.out.printf("Sending %d\n", num);
             new PrintStream(s.getOutputStream()).println(num);
-            System.out.println("Waiting for a reply...");
             // Receive a reply from the load balancer
-            System.out.println(new Scanner(s.getInputStream()).nextInt());
+//            System.out.printf("The reply is: %d\n", new Scanner(s.getInputStream()).nextInt());
+            Thread.sleep(100);
         } catch (Exception e) {}
         finally { // Always close the socket
             try {

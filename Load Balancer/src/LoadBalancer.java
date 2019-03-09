@@ -1,7 +1,10 @@
-import java.io.IOException;
 import java.io.PrintStream;
 import java.net.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 /**
  * Created by Aditya on 2/14/2019.
@@ -11,83 +14,87 @@ public class LoadBalancer implements Runnable {
     private static String SERVERADDRESS = "127.0.0.1";
     private static final int CLIENTPORT = 1341;
     private static final int SERVERPORT = 1342;
-    private Socket clientSocket, serverSocket;
+    private Socket clientSocket;
 
-    public LoadBalancer(Socket clientSoc, Socket serverSoc) {
+    private static volatile List<Socket> serverList;
+
+    public LoadBalancer(Socket clientSoc) {
         this.clientSocket = clientSoc;
-        this.serverSocket = serverSoc;
+        serverList = new ArrayList<>();
+        connect();
+    }
+
+    public static void connect() {
+        try {
+            Socket serverSocket = new Socket();
+            serverSocket.connect(new InetSocketAddress(SERVERADDRESS, SERVERPORT));
+            serverList.add(serverSocket);
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    public Socket getCurrentServer() {
+        for(Socket s : serverList) {
+            if(s.isConnected()) return s;
+        }
+        return null;
     }
 
     public void run() {
-        synchronized(this) {
+        Socket server = getCurrentServer();
+        try {
+            // Receive request from client
+            Scanner sc = new Scanner(clientSocket.getInputStream());
+            int clientInt = sc.nextInt();
+            System.out.println("Client sent: " + clientInt);
+
+            // Send to Server
+            new PrintStream(server.getOutputStream()).println(clientInt);
+
+            // Receive from server
+            int serverInt = new Scanner(server.getInputStream()).nextInt();
+            System.out.println("Server sent: " + serverInt);
+            // Send to client
+            new PrintStream(clientSocket.getOutputStream()).println(serverInt);
+            System.out.println("Reply from server sent to client");
+
+        } catch (Exception e) {
+            System.err.println("Exception: " + e.getLocalizedMessage());
+
+        }
+        finally {
             try {
-                while(clientSocket.isConnected() || serverSocket.isConnected()) {
-                    // Receive request from client
-                    Scanner sc = new Scanner(clientSocket.getInputStream());
-                    int clientInt = sc.nextInt();
-                    System.out.println("Client sent: " + clientInt);
-
-                    // Send to Server
-                    new PrintStream(serverSocket.getOutputStream()).println(clientInt);
-
-                    // Receive from server
-                    int serverInt = new Scanner(serverSocket.getInputStream()).nextInt();
-                    System.out.println("Server sent: " + serverInt);
-                    // Send to client
-                    new PrintStream(clientSocket.getOutputStream()).println(serverInt);
-                    System.out.println("Reply from server sent to client");
-                }
-            } catch (Exception e) {
-//                System.err.println("Exception: " + e.getLocalizedMessage());
-            }
-            finally {
-                try {
-                    clientSocket.close();
-                    System.out.println("clientSocket closed");
-//                    if(!serverSocket.isConnected()) {
-                        serverSocket.close();
-                        System.out.println("serverSocket closed");
-//                    }
-                } catch (Exception e) {}
-            }
+                clientSocket.close();
+                System.out.println("clientSocket closed");
+                server.close();
+                System.out.println("serverSocket closed");
+            } catch (Exception e) {}
         }
     }
 
     public static void main(String[] args) {
 
-        try {
-            Socket clientSocket,
-                    serverSocket = new Socket();
-
-            InetSocketAddress serverAddress = new InetSocketAddress(SERVERADDRESS, SERVERPORT);
-            serverSocket.connect(serverAddress);
-
-            ServerSocket serverConnection;
-            ServerSocket clientConnection = new ServerSocket(CLIENTPORT);
-            clientSocket = clientConnection.accept();
-
-            Thread serverThread = new Thread(new LoadBalancer(clientSocket, serverSocket));
-            serverThread.start();
+        try(ServerSocket serverSocket = new ServerSocket(CLIENTPORT)) {
+            Socket socket;
+            ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
 
             while(true) {
-                if(serverSocket.isClosed() && clientSocket.isClosed()) {
-                    System.out.println("Waiting for the server to reconnect...");
-                    serverSocket = new Socket();
-                    serverSocket.connect(serverAddress);
-//                serverConnection = new ServerSocket(SERVERPORT);
-//                serverSocket = serverConnection.accept();
-                    System.out.println("Server connected");
-
-                    System.out.println("Waiting for client to reconnect");
-//                connection = new ServerSocket(CLIENTPORT);
-                    clientSocket = clientConnection.accept();
-                    System.out.println("clientSocket.isClosed(): " + clientSocket.isClosed());
-
-                    new Thread(new LoadBalancer(clientSocket, serverSocket)).start();
+                try {
+                    System.out.println("Waiting for the client to connect...");
+                    socket = serverSocket.accept();
+                    pool.execute(new LoadBalancer(socket));
+                    System.out.println("Threads which completed their tasks: " + pool.getCompletedTaskCount());
+                    System.out.println("Client connected");
+                    Thread.sleep(100);
+                    System.out.println("Active threads: " + pool.getActiveCount());
+                }
+                catch(Exception e) {
+                    System.err.println(e.getMessage());
                 }
             }
         } catch (Exception e) {
-            System.err.println("Exception: " + e.getMessage());
+            System.err.println(e.getMessage());
         }
     }
 }

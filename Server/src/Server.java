@@ -6,10 +6,13 @@ import java.io.*;
 import java.net.*;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
 public class Server implements Runnable {
 
-    private Socket connectLoadBalancer;
+    private volatile Socket connectLoadBalancer;
 
     public Server(Socket socket) throws Exception {
 //        this.serverSocket = serverSocket;
@@ -18,28 +21,25 @@ public class Server implements Runnable {
 
     @Override
     public void run() {
-        synchronized(this) {
-            try {
-                while(connectLoadBalancer.isConnected()) {
-                    // Read in the number sent by the load balancer
-                    Scanner sc = new Scanner(connectLoadBalancer.getInputStream());
-                    int inNum = sc.nextInt();
-                    System.out.println("Number from load balancer: " + inNum);
-
-                    // Double the number and send it back
-                    new PrintStream(connectLoadBalancer.getOutputStream()).println(inNum * 2);
-                }
-            }
-
-            catch (Exception e) {}
-
-            finally {
-                try {
-                    closeSockets();
-                } catch (IOException e) {}
-                System.out.println("Connection with load balancer closed.");
-            }
+        try {
+            // Read in the number sent by the load balancer
+            Scanner sc = new Scanner(connectLoadBalancer.getInputStream());
+            int inNum = sc.nextInt();
+            System.out.println("Number from load balancer: " + inNum);
+            randomNumberCruncher();
+            // Double the number and send it back
+            new PrintStream(connectLoadBalancer.getOutputStream()).println(inNum * 2);
         }
+
+        catch (Exception e) {}
+
+        finally {
+            try {
+                closeSockets();
+            } catch (IOException e) {}
+            System.out.println("Connection with load balancer closed.");
+        }
+
     }
 
     private void closeSockets() throws IOException {
@@ -47,10 +47,11 @@ public class Server implements Runnable {
     }
 
     private void randomNumberCruncher() {
-        int n = new Random().nextInt(6) + 5;
+        Random r = new Random();
+        int n = r.nextInt(6) + 5;
         try {
-            Thread.sleep((new Random().nextInt(n) + 10) * 1000);
-            findNthFib(n*15);
+            Thread.sleep((r.nextInt(n) + 10) * 1000);
+            findNthFib(n*10);
         } catch (InterruptedException e) {
             System.err.println("Sleep not working");
         }
@@ -65,27 +66,31 @@ public class Server implements Runnable {
         }
     }
 
-//    private void closeServerSocket() throws IOException {
-//        serverSocket.close();
-//    }
-
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         final int PORTNUM = 1342;
 
         // Accept the connection
-        ServerSocket balancerSocket = new ServerSocket(PORTNUM);
-        Socket socket = balancerSocket.accept();
-        Thread serverThread = new Thread(new Server(socket));
-        serverThread.start();
+        try(ServerSocket serverSocket = new ServerSocket(PORTNUM)) {
+            Socket socket;
+            ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
 
-        while(true) {
-            if(socket.isClosed()) {
-                System.out.println("Waiting for the load balancer to connect...");
-                socket = balancerSocket.accept();
-                new Thread(new Server(socket)).start();
-                System.out.println("Load balancer connected");
+            while(true) {
+                try {
+                    System.out.println("Waiting for the load balancer to connect...");
+                    socket = serverSocket.accept();
+                    pool.execute(new Server(socket));
+                    System.out.println("Threads which completed their tasks: " + pool.getCompletedTaskCount());
+                    System.out.println("Load balancer connected");
+                    Thread.sleep(100);
+                    System.out.println("Active threads: " + pool.getActiveCount());
+                }
+                catch(Exception e) {
+                    System.err.println(e.getMessage());
+                }
             }
+        } catch (Exception e) {
+            System.err.println(e.getMessage());
         }
     }
 }
