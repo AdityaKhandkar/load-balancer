@@ -11,9 +11,9 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class LoadBalancer implements Runnable {
 
-    private static String SERVERADDRESS = "127.0.0.1";
-    private static final int CLIENTPORT = 1341;
-    private static final int SERVERPORT = 1342;
+    private static String SERVERADDRESS = "146.186.64.150";
+    private static final int CLIENTPORT = 1499;
+    private static final int SERVERPORT = 1500;
     private Socket clientSocket;
 
     private static volatile List<Socket> serverList;

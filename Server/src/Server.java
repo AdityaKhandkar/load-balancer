@@ -68,7 +68,7 @@ public class Server implements Runnable {
 
     public static void main(String[] args) {
 
-        final int PORTNUM = 1342;
+        final int PORTNUM = 1500;
 
         // Accept the connection
         try(ServerSocket serverSocket = new ServerSocket(PORTNUM)) {

@@ -2,7 +2,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.util.Scanner;
 
 /**
  * Created by Aditya on 1/17/2019.
@@ -12,8 +11,8 @@ public class Client {
 
     public static void main(String[] args) {
 
-        String loadBalancerAddress = "127.0.0.1";
-        final int PORT_NUM = 1341;
+        String loadBalancerAddress = "146.186.64.156";
+        final int PORT_NUM = 1499;
 
         InetSocketAddress hostAddress = new InetSocketAddress(loadBalancerAddress, PORT_NUM);
         Socket socket;
@@ -21,6 +20,7 @@ public class Client {
         try {
             // Make a new request with every loop.
             // Since its a new socket, its a new connection channel
+            System.out.println("IN TRY");
             while(true) {
                 socket = new Socket();
                 socket.connect(hostAddress);
@@ -46,7 +46,8 @@ public class Client {
 //            int num = new Scanner(System.in).nextInt();
             int num = 10;
             System.out.printf("Sending %d\n", num);
-            new PrintStream(s.getOutputStream()).println(num);
+            PrintStream outStream = new PrintStream(s.getOutputStream());
+            outStream.println(num);
             // Receive a reply from the load balancer
 //            System.out.printf("The reply is: %d\n", new Scanner(s.getInputStream()).nextInt());
             Thread.sleep(100);
