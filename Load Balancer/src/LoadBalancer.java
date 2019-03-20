@@ -11,9 +11,9 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 public class LoadBalancer implements Runnable {
 
-    private static String SERVERADDRESS = "146.186.64.150";
-    private static final int CLIENTPORT = 1499;
-    private static final int SERVERPORT = 1500;
+    private static String SERVERADDRESS = "ada.cs.hbg.psu.edu";
+    private static final int CLIENTPORT = 6149;
+    private static final int SERVERPORT = 6150;
     private Socket clientSocket;
 
     private static volatile List<Socket> serverList;
@@ -26,8 +26,8 @@ public class LoadBalancer implements Runnable {
 
     public static void connect() {
         try {
-            Socket serverSocket = new Socket();
-            serverSocket.connect(new InetSocketAddress(SERVERADDRESS, SERVERPORT));
+            Socket serverSocket = new Socket(SERVERADDRESS, SERVERPORT);
+            //serverSocket.connect(new InetSocketAddress(SERVERADDRESS, SERVERPORT));
             serverList.add(serverSocket);
         } catch (Exception e) {
             System.err.println(e.getMessage());

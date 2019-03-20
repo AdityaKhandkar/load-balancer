@@ -11,8 +11,8 @@ public class Client {
 
     public static void main(String[] args) {
 
-        String loadBalancerAddress = "146.186.64.156";
-        final int PORT_NUM = 1499;
+        String loadBalancerAddress = "dijkstra.cs.hbg.psu.edu";
+        final int PORT_NUM = 6149;
 
         InetSocketAddress hostAddress = new InetSocketAddress(loadBalancerAddress, PORT_NUM);
         Socket socket;
@@ -22,8 +22,9 @@ public class Client {
             // Since its a new socket, its a new connection channel
             System.out.println("IN TRY");
             while(true) {
-                socket = new Socket();
-                socket.connect(hostAddress);
+//                System.out.println("Y");
+                socket = new Socket(loadBalancerAddress, PORT_NUM);
+                //socket.connect(hostAddress);
                 communicate(socket);
             }
         } catch (IOException e ) {
