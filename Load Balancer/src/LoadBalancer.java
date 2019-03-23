@@ -50,12 +50,12 @@ public class LoadBalancer implements Runnable {
             int clientInt = sc.nextInt();
             System.out.println("Client sent: " + clientInt);
 
-            // Send to Server
+            // Send to ServerImpl
             new PrintStream(server.getOutputStream()).println(clientInt);
 
             // Receive from server
             int serverInt = new Scanner(server.getInputStream()).nextInt();
-            System.out.println("Server sent: " + serverInt);
+            System.out.println("ServerImpl sent: " + serverInt);
             // Send to client
             new PrintStream(clientSocket.getOutputStream()).println(serverInt);
             System.out.println("Reply from server sent to client");

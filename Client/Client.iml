@@ -9,5 +9,6 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="Load Balancer" />
+    <orderEntry type="library" name="Client" level="project" />
   </component>
 </module>
