@@ -1,14 +1,15 @@
+import java.net.Socket;
+
 /**
  * Created by Aditya on 3/21/2019.
  */
-public class Main {
+public class ServerMain {
     public static void main(String[] args) {
         int port = 6150;
-        String serverAddr = "localhost";
         try {
-            new ServerImpl();
+            new Server(port, new NumberCruncher()).start();
         } catch (Exception e) {
-
+            System.err.println("In Main: " + e.getMessage());
         }
     }
 }

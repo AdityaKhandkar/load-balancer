@@ -8,7 +8,8 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="Load Balancer" />
+    <orderEntry type="module" module-name="Load Balancer" scope="PROVIDED" />
     <orderEntry type="library" name="Client" level="project" />
+    <orderEntry type="module" module-name="Server" scope="PROVIDED" />
   </component>
 </module>

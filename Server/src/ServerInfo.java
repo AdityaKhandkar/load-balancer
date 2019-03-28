@@ -1,7 +1,7 @@
 /**
  * Created by Aditya on 3/21/2019.
  */
-public class ServerInfo {
+class ServerInfo {
     private String serverIP;
     private int port;
 
@@ -24,6 +24,11 @@ public class ServerInfo {
 
     public int getPort() {
         return port;
+    }
+
+    @Override
+    public String toString() {
+        return this.serverIP + " " + this.port;
     }
 
     @Override
