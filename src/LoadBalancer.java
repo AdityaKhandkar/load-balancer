@@ -103,6 +103,7 @@ public class LoadBalancer implements Application {
     public String start(InputStream in) {
         // NOt
 //        return client.communicate(currentServer, new Scanner(in).nextInt());
+        // TODO: Find the appropriate server to contact, send message, wait for response.
         return client.communicate(servers.get(0), new Scanner(in).nextInt());
 
     }
