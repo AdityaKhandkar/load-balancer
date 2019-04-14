@@ -6,24 +6,26 @@ import java.util.Scanner;
  * Created by Aditya on 1/17/2019.
  */
 
-public class Client {
+class Client {
 
-    public String communicate(ServerInfo serverInfo, int message) {
+    public static String EXCEPTION = "EXCEPTION: ";
+
+    public String communicate(ServerInfo serverInfo, long message) {
         Socket s = null;
         try {
             s = new Socket(serverInfo.getServerIP(), serverInfo.getPort());
 
-
             // Sending message to server
-            System.out.printf("Sending %d\n", message);
+            System.out.printf("Sending %d, at port %d\n", message, serverInfo.getPort());
 
             new PrintStream(s.getOutputStream()).println(message);
 
-            // Receive a reply from the load balancer
-            return new Scanner(s.getInputStream()).nextLine();
+            // Receive a reply from the server
+            String reply = new Scanner(s.getInputStream()).nextLine();
 
-//            System.out.printf("The reply is: %d\n", new Scanner(s.getInputStream()).nextInt());
-//            Thread.sleep(100);
+            System.out.println("reply: " + reply);
+
+            return reply;
 
         } catch (Exception e) {
             System.err.println("In communicate: " + e.getMessage());
@@ -34,6 +36,6 @@ public class Client {
                 System.err.println("In communicate-finally: " + e.getMessage());
             }
         }
-        return "";
+        return EXCEPTION;
     }
 }
