@@ -28,7 +28,7 @@ class ServerInfo {
 
     @Override
     public String toString() {
-        return this.serverIP + " " + this.port;
+        return this.serverIP     + " " + this.port;
     }
 
     @Override

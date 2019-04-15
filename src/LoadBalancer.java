@@ -1,110 +1,142 @@
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintStream;
-import java.net.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
-
+import java.util.*;
+import java.util.concurrent.Future;
 
 /**
  * Created by Aditya on 2/14/2019.
  */
-public class LoadBalancer implements Application {
+class LoadBalancer implements Application {
 
-    private static String sunlabServer = "ada.cs.hbg.psu.edu";
-    private static String localhost = "localhost";
-    private static String SERVERADDRESS = localhost;
-    private static final int CLIENTPORT = 6149;
-    private static final int SERVERPORT = 6150;
-    private int serverPort;
-    private Socket clientSocket;
-
-    private static volatile List<Socket> serverList;
-    private static volatile List<ServerInfo> servers;
+    private final int MAX_ITERATIONS = 100000;
+    private volatile List<ServerInfo> servers;
+    public volatile List<ServerStatus> status;
     private Client client;
-    private ServerInfo currentServer;
 
-//    public LoadBalancer(Socket clientSoc) {
-//        this.clientSocket = clientSoc;
-//        serverList = new ArrayList<>();
-//        connect();
-//    }
 
     public LoadBalancer(List<ServerInfo> servers, Client client) {
         this.servers = servers;
         this.client = client;
-        makeConnection();
+        loadServerStatus();
     }
 
-//    public static void connect() {
-//        try {
-//            Socket serverSocket = new Socket(SERVERADDRESS, SERVERPORT);
-//            //serverSocket.connect(new InetSocketAddress(SERVERADDRESS, SERVERPORT));
-//            serverList.add(serverSocket);
-//        } catch (Exception e) {
-//            System.err.println(e.getMessage());
-//        }
-//    }
+    public void loadServerStatus() {
+        status = new ArrayList<>();
+        servers.forEach(s -> status.add(new ServerStatus(s)));
+    }
 
-    public void makeConnection() {
-        List<Socket> connections = new ArrayList<>(servers.size());
-        servers.forEach(s -> {
-            try {
-                connections.add(new Socket(s.getServerIP(), s.getPort()));
-            } catch (IOException e) {
-                System.err.println("In makeConnection: " + s.toString() + " " + e.getMessage());
+    // Load balancing algorithm
+    @Override
+    public String start(long msg) {
+        int iteration = 0;
+
+        do {
+            // TODO: Figure out which server to send request to, and wait for response
+            for(int i = 0; i < status.size(); i++) {
+                ServerStatus serverStatus = status.get(i);
+
+                int availableThreads = serverStatus.getAvailableThreads();
+
+                System.out.println("serverThreads: " + availableThreads);
+                System.out.println("Message from client: " + msg);
+
+                if(availableThreads > 0) {
+                    serverStatus.setAvailableThreads(availableThreads--);
+
+                    prioritizeUnavailable(i);
+
+                    String response = client.communicate(serverStatus.getServerInfo(), msg);
+                    serverStatus.setAvailableThreads(availableThreads++);
+
+                    prioritizeAvailable(i);
+
+                    return response;
+                }
             }
-        });
+        } while (iteration++ > MAX_ITERATIONS);
+
+        System.out.println("All servers are busy.");
+
+        // If all servers are currently busy, restart the process.
+        return Client.EXCEPTION + " Servers busy. Please try again later.";
     }
 
-    public Socket getCurrentServer() {
-        for(Socket s : serverList) {
-            if(s.isConnected()) return s;
+    public synchronized void prioritizeAvailable(int index) {
+        if(index == 0) return;
+
+        ServerStatus serverStatus = status.get(index);
+
+        for(int i = index - 1; i >= 0; i--) {
+            if(serverStatus.compareTo(status.get(i)) <= 0) {
+                serverStatus = status.remove(index);
+                status.add(i, serverStatus);
+                break;
+            }
         }
-        return null;
     }
 
-//    public void run() {
-//        Socket server = getCurrentServer();
-//        try {
-//            // Receive request from client
-//            Scanner sc = new Scanner(clientSocket.getInputStream());
-//            int clientInt = sc.nextInt();
-//            System.out.println("Client sent: " + clientInt);
-//
-//            // Send to ServerImpl
-//            new PrintStream(server.getOutputStream()).println(clientInt);
-//
-//            // Receive from server
-//            int serverInt = new Scanner(server.getInputStream()).nextInt();
-//            System.out.println("ServerImpl sent: " + serverInt);
-//            // Send to client
-//            new PrintStream(clientSocket.getOutputStream()).println(serverInt);
-//            System.out.println("Reply from server sent to client");
-//
-//        } catch (Exception e) {
-//            System.err.println("Exception: " + e.getLocalizedMessage());
-//
-//        }
-//        finally {
-//            try {
-//                clientSocket.close();
-//                System.out.println("clientSocket closed");
-//                server.close();
-//                System.out.println("serverSocket closed");
-//            } catch (Exception e) {}
-//        }
-//    }
+    public synchronized void prioritizeUnavailable(int index) {
+        if(index == status.size() - 1) return;
+
+        ServerStatus serverStatus = status.get(index);
+
+        for(int i = index + 1; i < status.size(); i++) {
+            if(serverStatus.compareTo(status.get(i)) >= 0) {
+                serverStatus = status.remove(index);
+                status.add(i, serverStatus);
+                break;
+            }
+        }
+    }
 
     @Override
+<<<<<<< HEAD
     public String start(InputStream in) {
         // NOt
 //        return client.communicate(currentServer, new Scanner(in).nextInt());
         // TODO: Find the appropriate server to contact, send message, wait for response.
         return client.communicate(servers.get(0), new Scanner(in).nextInt());
+=======
+    public String type() {
+        return "Load Balancer";
+    }
+
+    public static void main(String[] args) {
+
+        // List of servers
+        String serverAddressPrefix = ".cs.hbg.psu.edu";
+        List<String> serversAddresses = new ArrayList<>(Arrays.asList("ada", "dijkstra", "noyce",
+                "nygaard", "euclid", "euler",
+                "gauss", "riemann", "babbage"));
+        List<Integer> serverPorts = new ArrayList<>(Arrays.asList(6150, 6151, 6152,
+                6153, 6154, 6155,
+                6156, 6157, 6158));
+
+        List<ServerInfo> servers = new ArrayList<>();
+
+        ListIterator<String> addrIter;
+        ListIterator<Integer> portIter;
+
+
+        for (addrIter = serversAddresses.listIterator(), portIter = serverPorts.listIterator();
+             addrIter.hasNext() && portIter.hasNext();) {
+            servers.add(new ServerInfo(addrIter.next() + serverAddressPrefix, portIter.next()));
+        }
+
+        LoadBalancer lb = new LoadBalancer(servers, new Client());
+
+        lb.status.get(5).setAvailableThreads(6);
+        System.out.println("before prioritizing " + lb.status.get(5).getServerInfo().toString());
+        System.out.println(lb.status.toString());
+        lb.prioritizeAvailable(5);
+        System.out.println("after prioritizing " + lb.status.get(5).getServerInfo().toString());
+        System.out.println(lb.status.toString());
+
+        System.out.println("before prioritizing " + lb.status.get(3).getServerInfo().toString());
+        System.out.println(lb.status.toString());
+        lb.prioritizeUnavailable(3);
+        System.out.println("after prioritizing " + lb.status.get(3).getServerInfo().toString());
+        System.out.println(lb.status.toString());
+
+>>>>>>> bbb2a73472ca996092150e54450ed8cff7be3bdb
 
     }
 }

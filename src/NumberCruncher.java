@@ -11,35 +11,29 @@ import java.util.Random;
 class NumberCruncher implements Application {
 
     @Override
-    public String start(InputStream data) {
-        try(BufferedReader br = new BufferedReader(new InputStreamReader(data))) {
-            int i = br.read();
-            return Long.toString(randomNumberCruncher(i));
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-            return "";
-        }
+    public String start(long data) {
+        return Long.toString(randomNumberCruncher(data));
     }
 
-    private long randomNumberCruncher(int num) {
-        Random r = new Random(num);
-        int n = r.nextInt(6) + 5;
+    @Override
+    public String type() {
+        return "Number Cruncher";
+    }
+
+    private long randomNumberCruncher(long num) {
+        Random r = new Random();
+//        int n = r.nextInt((int)num) + 5;
         try {
-            Thread.sleep((r.nextInt(n) + 10) * 1000);
-            return findNthFib(n*10);
+            Thread.sleep((num / 10) * 1000);
+            return findNthFib((int)num);
         } catch (InterruptedException e) {
-            System.err.println("Sleep not working");
+            System.err.println("Can't sleep");
             return -1;
         }
     }
 
     private long findNthFib(int n) {
-        int prev = 0, curr = 1;
-        for(int i = 0; i <= n; i++) {
-            int temp = prev + curr;
-            prev = curr;
-            curr = temp;
-        }
-        return curr;
+        if(n <= 1) return n;
+        return findNthFib(n - 1) + findNthFib(n - 2);
     }
 }

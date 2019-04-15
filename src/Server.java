@@ -5,14 +5,17 @@
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
-public class Server implements Runnable  {
+class Server implements Runnable {
 
-    private volatile Socket connectClient;
+    private volatile Socket clientSocket;
     private Application app;
     private int port;
+
+    public static final int THREAD_LIMIT = 10;
 
     public Server(int port, Application app) {
         this(port, new Socket(), app);
@@ -20,7 +23,7 @@ public class Server implements Runnable  {
 
     private Server(int port, Socket socket, Application app) {
         this.port = port;
-        connectClient = socket;
+        clientSocket = socket;
         this.app = app;
     }
 
@@ -28,17 +31,17 @@ public class Server implements Runnable  {
     public void run() {
         try {
             // Read in the number sent by the client
-            Scanner sc = new Scanner(connectClient.getInputStream());
-            int inNum = sc.nextInt();
-            System.out.println("Number from client: " + inNum);
-            String result = app.start(connectClient.getInputStream());
+            long data = new Scanner(clientSocket.getInputStream()).nextInt();
+            System.out.println("Number from client: " + data);
+            String result = app.start(data);
+            System.out.println(app.type() + " says " + result);
             // Send back the result to the client
-            new PrintStream(connectClient.getOutputStream()).println(result);
+            new PrintStream(clientSocket.getOutputStream()).println(result);
         } catch (Exception e) {
             System.err.println("In start: " + e.getMessage());
         } finally {
             try {
-                connectClient.close();
+                clientSocket.close();
             } catch (IOException e) {
                 System.err.println("In finally: " + e.getMessage());
             }
@@ -50,7 +53,7 @@ public class Server implements Runnable  {
         try(ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server is running");
             Socket socket;
-            ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(5);
+            ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(THREAD_LIMIT);
 
             while(true) {
                 try {
