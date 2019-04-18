@@ -7,14 +7,14 @@ import java.net.*;
 public class ServerMain {
     public static void main(String[] args) {
 
-        final int NUM_SERVERS = 6;
+        final int NUM_SERVERS = 3;
 
-        String[] servers = { "grace", "dijkstra", "noyce",
-                             "nygaard", "euclid", "euler" };
+        String[] servers = { "grace", "dijkstra", "noyce"};
+//                             "nygaard", "euclid", "euler".
 //                             "gauss", "riemann", "babbage" };
 
-        int[] ports = {6151, 6152, 6153,
-                       6154, 6155, 6156 };
+        int[] ports = {6151, 6152, 6153 };
+//                       6154, 6155, 6156,
 //                       6157, 6158, 61598};
 
         try {
