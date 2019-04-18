@@ -9,9 +9,9 @@ public class ServerMain {
 
         final int NUM_SERVERS = 9;
 
-        String[] servers = { "grace.cs.hbg.psu.edu", "dijkstra.cs.hbg.psu.edu", "noyce.cs.hbg.psu.edu",
-                "nygaard.cs.hbg.psu.edu", "fourier.cs.hbg.psu.edu", "euler.cs.hbg.psu.edu",
-                "gauss.cs.hbg.psu.edu", "fermat.cs.hbg.psu.edu", "babbage.cs.hbg.psu.edu" };
+        String[] servers = { "grace", "dijkstra", "noyce",
+                             "nygaard", "euclid", "euler",
+                             "gauss", "riemann", "babbage" };
 
         int[] ports = {6151, 6152, 6153,
                        6154, 6155, 6156,
@@ -19,16 +19,16 @@ public class ServerMain {
 
         try {
             InetAddress addr = java.net.InetAddress.getLocalHost();
-            System.out.println(addr);
-            String hostname = addr.getCanonicalHostName();
+//            System.out.println(addr);
+            String hostname = addr.getCanonicalHostName().split("\\.")[0];
             System.out.println("Hostname of system = " + hostname);
 
-//            for(int i = 0; i < NUM_SERVERS; i++) {
-//                if(servers[i].equals(hostname)) {
-//                    new Server(ports[i], new NumberCruncher()).start();
-//                    break;
-//                }
-//            }
+            for(int i = 0; i < NUM_SERVERS; i++) {
+                if(servers[i].equals(hostname)) {
+                    new Server(ports[i], new NumberCruncher()).start();
+                    break;
+                }
+            }
         } catch(Exception e) {
             System.err.println("In Main: " + e.getMessage());
         }
