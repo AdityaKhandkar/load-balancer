@@ -6,23 +6,26 @@ import java.util.ListIterator;
 /**
  * Created by Aditya on 3/25/2019.
  */
+
 public class LoadBalancerMain {
     public static void main(String[] args) {
 
         boolean debug = false;
 
-        int serverPort = 6150;
-        int clientPort = 6149;
+        // Only for local testing
+        int serverPort = 6149;
         String localhost = "localhost";
+
+        int clientPort = 6150;
 
         // List of servers
         String serverAddressPrefix = ".cs.hbg.psu.edu";
-        List<String> serversAddresses = new ArrayList<>(Arrays.asList("ada", "dijkstra", "noyce",
-                "nygaard", "euclid", "euler",
-                "gauss", "riemann", "babbage"));
-        List<Integer> serverPorts = new ArrayList<>(Arrays.asList(6150, 6151, 6152,
-                6153, 6154, 6155,
-                6156, 6157, 6158));
+        List<String> serversAddresses = new ArrayList<>(Arrays.asList("grace", "dijkstra", "noyce",
+                                                                      "nygaard", "euclid", "euler",
+                                                                      "gauss", "riemann", "babbage"));
+        List<Integer> serverPorts = new ArrayList<>(Arrays.asList(6151, 6152, 6153,
+                                                                  6154, 6155, 6156,
+                                                                  6157, 6158, 6159));
 
         List<ServerInfo> servers = new ArrayList<>();
 
@@ -41,7 +44,7 @@ public class LoadBalancerMain {
         try {
             new Server(clientPort, new LoadBalancer(servers, new Client())).start();
         } catch (Exception e) {
-            System.err.println("In LoadBalancerMain" + e.getMessage());
+            System.err.println("In LoadBalancerMain: " + e.getMessage());
         }
     }
 }
