@@ -23,7 +23,7 @@ public class ClientMain {
         while(true) {
             try {
                 pool.execute(() ->
-                        System.out.println(new Client().communicate(loadBalancerInfo, r.nextInt(200) + 100)));
+                        System.out.println(new Client().communicate(loadBalancerInfo, r.nextInt(20) + 10)));
             } catch (Exception e) {
                 System.err.println("In ClientMain: " + e.getMessage());
             }

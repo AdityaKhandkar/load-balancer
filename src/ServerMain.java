@@ -7,19 +7,18 @@ import java.net.*;
 public class ServerMain {
     public static void main(String[] args) {
 
-        final int NUM_SERVERS = 9;
+        final int NUM_SERVERS = 6;
 
         String[] servers = { "grace", "dijkstra", "noyce",
-                             "nygaard", "euclid", "euler",
-                             "gauss", "riemann", "babbage" };
+                             "nygaard", "euclid", "euler" };
+//                             "gauss", "riemann", "babbage" };
 
         int[] ports = {6151, 6152, 6153,
-                       6154, 6155, 6156,
-                       6157, 6158, 61598};
+                       6154, 6155, 6156 };
+//                       6157, 6158, 61598};
 
         try {
             InetAddress addr = java.net.InetAddress.getLocalHost();
-//            System.out.println(addr);
             String hostname = addr.getCanonicalHostName().split("\\.")[0];
             System.out.println("Hostname of system = " + hostname);
 

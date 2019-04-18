@@ -21,18 +21,20 @@ class NumberCruncher implements Application {
     }
 
     private long randomNumberCruncher(long num) {
-        Random r = new Random();
-//        int n = r.nextInt((int)num) + 5;
+        sleep((num / 10) * 1000);
+        return findNthFib((int)num);
+    }
+
+    private void sleep(long millis) {
         try {
-            Thread.sleep((num / 10) * 1000);
-            return findNthFib((int)num);
+            Thread.sleep(millis);
         } catch (InterruptedException e) {
-            System.err.println("Can't sleep");
-            return -1;
+            System.err.println("In Number Cruncher: " + e.getMessage());
         }
     }
 
     private long findNthFib(int n) {
+        if(n % 5 == 0) sleep(2000);
         if(n <= 1) return n;
         return findNthFib(n - 1) + findNthFib(n - 2);
     }

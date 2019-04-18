@@ -21,11 +21,11 @@ public class LoadBalancerMain {
         // List of servers
         String serverAddressPrefix = ".cs.hbg.psu.edu";
         List<String> serversAddresses = new ArrayList<>(Arrays.asList("grace", "dijkstra", "noyce",
-                                                                      "nygaard", "euclid", "euler",
-                                                                      "gauss", "riemann", "babbage"));
+                                                                      "nygaard", "euclid", "euler"));
+//                                                                      "gauss", "riemann", "babbage"));
         List<Integer> serverPorts = new ArrayList<>(Arrays.asList(6151, 6152, 6153,
-                                                                  6154, 6155, 6156,
-                                                                  6157, 6158, 6159));
+                                                                  6154, 6155, 6156));
+//                                                                  6157, 6158, 6159));
 
         List<ServerInfo> servers = new ArrayList<>();
 
