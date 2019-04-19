@@ -1,5 +1,3 @@
-import org.jetbrains.annotations.NotNull;
-
 /**
  * Created by Aditya on 4/14/2019.
  */
@@ -29,7 +27,7 @@ class ServerStatus implements Comparable {
     }
 
     @Override
-    public synchronized int compareTo(@NotNull Object o) {
+    public synchronized int compareTo(Object o) {
         if(o instanceof ServerStatus) {
             ServerStatus that = (ServerStatus) o;
             return Integer.compare(this.getAvailableThreads(), that.getAvailableThreads());
