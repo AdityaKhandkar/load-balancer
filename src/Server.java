@@ -31,9 +31,9 @@ class Server implements Runnable {
         try {
             // Read in the number sent by the client
             long data = new Scanner(clientSocket.getInputStream()).nextInt();
-            System.out.println("Number from client: " + data);
+            Print.out("Number from client: " + data);
             String result = app.start(data);
-            System.out.println(app.type() + " says " + result);
+            Print.out(app.type() + " says " + result);
             // Send back the result to the client
             new PrintStream(clientSocket.getOutputStream()).println(result);
         } catch (Exception e) {
@@ -44,15 +44,16 @@ class Server implements Runnable {
             } catch (IOException e) {
                 System.err.println("In finally: " + e.getMessage());
             }
-            System.out.println("Connection with client closed.");
+            Print.out("Connection with client closed.");
         }
     }
 
     public void start() {
         try(ServerSocket serverSocket = new ServerSocket(listenForClientPort)) {
+            String machineName = java.net.InetAddress.getLocalHost().getCanonicalHostName().split("\\.")[0];
             System.out.println("Server is listening on listenForClientPort " + listenForClientPort);
+            System.out.println(machineName);
             System.out.println("The application is " + app.type());
-            System.out.println("Thread name: " + Thread.currentThread().getName());
 
             Socket socket;
             ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(THREAD_LIMIT);
@@ -64,8 +65,7 @@ class Server implements Runnable {
                     pool.execute(new Server(listenForClientPort, socket, app));
                     System.out.println("Threads which completed their tasks: " + pool.getCompletedTaskCount());
                     System.out.println("Client connected");
-                    Thread.sleep(100);
-                    System.out.println("Active threads: " + pool.getActiveCount());
+                    System.out.printf("Active threads in %s: %d \n", machineName, pool.getActiveCount());
                 } catch(Exception e) {
                     System.err.println("In while: " + e.getMessage());
                 }

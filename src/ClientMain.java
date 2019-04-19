@@ -18,13 +18,13 @@ public class ClientMain {
 
         ServerInfo loadBalancerInfo = new ServerInfo(sunLabLoadBalancerAddress, loadBalancerPort);
 
-        ExecutorService pool = Executors.newFixedThreadPool(Server.THREAD_LIMIT + 5);
+        ExecutorService pool = Executors.newFixedThreadPool(Server.THREAD_LIMIT);
 
 
         try {
             while(true) {
                 pool.execute(() ->
-                        System.out.println(new Client().communicate(loadBalancerInfo, r.nextInt(20) + 10)));
+                        System.out.println(new Client().communicate(loadBalancerInfo, r.nextInt(15) + 10)));
             }
         } catch (Exception e) {
             System.err.println("In ClientMain: " + e.getMessage());

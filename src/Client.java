@@ -17,24 +17,23 @@ class Client {
             s = new Socket(serverInfo.getServerIP(), serverInfo.getPort());
 
             // Sending message to server
-            System.out.printf("Sending %d, at port %d\n", message, serverInfo.getPort());
+            Print.out(message, serverInfo.getPort());
 
             new PrintStream(s.getOutputStream()).println(message);
 
             // Receive a reply from the server
             String reply = new Scanner(s.getInputStream()).nextLine();
 
-            System.out.println("reply: " + reply);
+            Print.out("Reply: " + reply);
 
             return reply;
-
         } catch (Exception e) {
-            System.err.println("In communicate: " + e.getMessage());
+            Print.out("In communicate: " + e.getMessage());
         } finally { // Always close the socket
             try {
                 s.close();
             } catch (Exception e) {
-                System.err.println("In communicate-finally: " + e.getMessage());
+                Print.out("In communicate-finally: " + e.getMessage());
             }
         }
         return EXCEPTION;

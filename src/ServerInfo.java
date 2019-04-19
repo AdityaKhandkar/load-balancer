@@ -22,6 +22,10 @@ class ServerInfo {
         return serverIP;
     }
 
+    public String getServerName() {
+        return serverIP.split("\\.")[0];
+    }
+
     public int getPort() {
         return port;
     }

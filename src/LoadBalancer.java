@@ -34,8 +34,9 @@ class LoadBalancer implements Application {
 
                 int availableThreads = serverStatus.getAvailableThreads();
 
-                System.out.println("serverThreads: " + availableThreads);
-                System.out.println("Message from client: " + msg);
+                Print.out(serverStatus.getServerInfo().getServerName());
+                Print.out("serverThreads: " + availableThreads);
+                Print.out("Message from client: " + msg);
 
                 if(availableThreads > 0) {
                     serverStatus.setAvailableThreads(availableThreads--);
@@ -53,7 +54,7 @@ class LoadBalancer implements Application {
             }
         } while (iteration++ > MAX_ITERATIONS);
 
-        System.out.println("All servers are busy.");
+        Print.out("All servers are busy.");
 
         // If all servers are currently busy, restart the process.
         return Client.EXCEPTION + " Servers busy. Please try again later.";
