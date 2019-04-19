@@ -13,7 +13,7 @@ public class ServerMain {
 //                             "nygaard", "euclid", "euler".
 //                             "gauss", "riemann", "babbage" };
 
-        int[] ports = {6151, 6152, 6153 };
+        int[] listenForClientPorts = {6151, 6152, 6153};
 //                       6154, 6155, 6156,
 //                       6157, 6158, 61598};
 
@@ -24,7 +24,7 @@ public class ServerMain {
 
             for(int i = 0; i < NUM_SERVERS; i++) {
                 if(servers[i].equals(hostname)) {
-                    new Server(ports[i], new NumberCruncher()).start();
+                    new Server(listenForClientPorts[i], new NumberCruncher()).start();
                     break;
                 }
             }

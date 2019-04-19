@@ -16,7 +16,7 @@ public class LoadBalancerMain {
         int serverPort = 6149;
         String localhost = "localhost";
 
-        int clientPort = 6150;
+        int listenForClientPort = 6150;
 
         // List of servers
         String serverAddressPrefix = ".cs.hbg.psu.edu";
@@ -42,7 +42,7 @@ public class LoadBalancerMain {
         }
 
         try {
-            new Server(clientPort, new LoadBalancer(servers, new Client())).start();
+            new Server(listenForClientPort, new LoadBalancer(servers, new Client())).start();
         } catch (Exception e) {
             System.err.println("In LoadBalancerMain: " + e.getMessage());
         }

@@ -5,7 +5,6 @@
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -13,16 +12,16 @@ class Server implements Runnable {
 
     private volatile Socket clientSocket;
     private Application app;
-    private int port;
+    private int listenForClientPort;
 
     public static final int THREAD_LIMIT = 10;
 
-    public Server(int port, Application app) {
-        this(port, new Socket(), app);
+    public Server(int listenForClientPort, Application app) {
+        this(listenForClientPort, new Socket(), app);
     }
 
-    private Server(int port, Socket socket, Application app) {
-        this.port = port;
+    private Server(int listenForClientPort, Socket socket, Application app) {
+        this.listenForClientPort = listenForClientPort;
         clientSocket = socket;
         this.app = app;
     }
@@ -50,8 +49,11 @@ class Server implements Runnable {
     }
 
     public void start() {
-        try(ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server is running");
+        try(ServerSocket serverSocket = new ServerSocket(listenForClientPort)) {
+            System.out.println("Server is listening on listenForClientPort " + listenForClientPort);
+            System.out.println("The application is " + app.type());
+            System.out.println("Thread name: " + Thread.currentThread().getName());
+
             Socket socket;
             ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(THREAD_LIMIT);
 
@@ -59,7 +61,7 @@ class Server implements Runnable {
                 try {
                     System.out.println("Waiting for the client to connect...");
                     socket = serverSocket.accept();
-                    pool.execute(new Server(port, socket, app));
+                    pool.execute(new Server(listenForClientPort, socket, app));
                     System.out.println("Threads which completed their tasks: " + pool.getCompletedTaskCount());
                     System.out.println("Client connected");
                     Thread.sleep(100);

@@ -9,14 +9,13 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class ClientMain {
     public static void main(String[] args) {
-        String sunlabLoadBalancer = "dijkstra.cs.hbg.psu.edu";
         String localhost = "localhost";
         String loadBalancerAddress = localhost;
-        final int PORT_NUM = 6149;
+        final int loadBalancerPort = 6150;
 
         Random r = new Random();
 
-        ServerInfo loadBalancerInfo = new ServerInfo(loadBalancerAddress, PORT_NUM);
+        ServerInfo loadBalancerInfo = new ServerInfo(loadBalancerAddress, loadBalancerPort);
 
         ExecutorService pool = Executors.newFixedThreadPool(Server.THREAD_LIMIT + 5);
 
