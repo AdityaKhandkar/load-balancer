@@ -51,9 +51,9 @@ class Server implements Runnable {
     public void start() {
         try(ServerSocket serverSocket = new ServerSocket(listenForClientPort)) {
             String machineName = java.net.InetAddress.getLocalHost().getCanonicalHostName().split("\\.")[0];
-            System.out.println("Server is listening on listenForClientPort " + listenForClientPort);
-            System.out.println(machineName);
-            System.out.println("The application is " + app.type());
+            System.out.println("On " + machineName);
+            System.out.println("Listening on port: " + listenForClientPort);
+            System.out.println("Application: " + app.type());
 
             Socket socket;
             ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(THREAD_LIMIT);
