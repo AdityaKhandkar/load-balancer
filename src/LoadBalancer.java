@@ -1,4 +1,3 @@
-import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -6,7 +5,7 @@ import java.util.*;
  */
 class LoadBalancer implements Application {
 
-    private final int MAX_ITERATIONS = 100000;
+    private final int MAX_ITERATIONS = 100;
     private volatile List<ServerInfo> servers;
     private volatile List<ServerStatus> status;
     private Client client;
@@ -33,9 +32,11 @@ class LoadBalancer implements Application {
                 ServerStatus serverStatus = status.get(i);
 
                 int availableThreads = serverStatus.getAvailableThreads();
+                String name = serverStatus.getServerInfo().getServerName();
 
-                Print.out(serverStatus.getServerInfo().getServerName());
-                Print.out("serverThreads: " + availableThreads);
+                Print.out("In " + type() + " start: ");
+                Print.out("Looking at: " + name);
+                Print.out("ServerThreads: " + availableThreads);
                 Print.out("Message from client: " + msg);
 
                 if(availableThreads > 0) {
@@ -43,6 +44,7 @@ class LoadBalancer implements Application {
 
                     prioritizeUnavailable(i);
 
+                    Print.out("Sending load to " + name);
                     String response = client.communicate(serverStatus.getServerInfo(), msg);
 
                     serverStatus.setAvailableThreads(availableThreads++);
@@ -57,7 +59,7 @@ class LoadBalancer implements Application {
         Print.out("All servers are busy.");
 
         // If all servers are currently busy, restart the process.
-        return Client.EXCEPTION + " Servers busy. Please try again later.";
+        return Client.EXCEPTION + " All servers busy. Please try again later.";
     }
 
     private synchronized void prioritizeAvailable(int index) {

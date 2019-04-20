@@ -21,8 +21,6 @@ class NumberCruncher implements Application {
     }
 
     private long randomNumberCruncher(long num) {
-        sleep((num / 5) * 1000);
-        System.out.println("Thread state: " + Thread.currentThread().getState().toString());
         return findNthFib(num);
     }
 
@@ -35,7 +33,7 @@ class NumberCruncher implements Application {
     }
 
     private long findNthFib(long n) {
-        if(n % 5 == 0) sleep(200);
+        if(n % 5 == 0) sleep(1000);
         if(n <= 1) return n;
         return findNthFib(n - 1) + findNthFib(n - 2);
     }

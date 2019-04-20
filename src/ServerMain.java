@@ -5,9 +5,10 @@
 import java.net.*;
 
 public class ServerMain {
-    public static void main(String[] args) {
 
-        final int NUM_SERVERS = 3;
+    public static final int NUM_SERVERS = 3;
+
+    public static void main(String[] args) {
 
         String[] servers = { "grace", "dijkstra", "noyce"};
 //                             "nygaard", "euclid", "euler".
@@ -20,7 +21,6 @@ public class ServerMain {
         try {
             InetAddress addr = java.net.InetAddress.getLocalHost();
             String hostname = addr.getCanonicalHostName().split("\\.")[0];
-            System.out.println("Hostname of system = " + hostname);
 
             for(int i = 0; i < NUM_SERVERS; i++) {
                 if(servers[i].equals(hostname)) {

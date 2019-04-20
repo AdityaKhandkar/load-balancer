@@ -11,20 +11,31 @@ public class ClientMain {
     public static void main(String[] args) {
         String localhost = "localhost";
         String loadBalancerAddress = localhost;
+
         String sunLabLoadBalancerAddress = "ada.hbg.psu.edu";
         final int loadBalancerPort = 6150;
+        final int MAX_RANDOM = 15;
+        final int MIN_NUM = 10;
 
         Random r = new Random();
 
         ServerInfo loadBalancerInfo = new ServerInfo(sunLabLoadBalancerAddress, loadBalancerPort);
 
-        ExecutorService pool = Executors.newFixedThreadPool(Server.THREAD_LIMIT);
-
+        ExecutorService pool = Executors.newFixedThreadPool(ServerMain.NUM_SERVERS * Server.THREAD_LIMIT);
 
         try {
             while(true) {
                 pool.execute(() ->
-                        System.out.println(new Client().communicate(loadBalancerInfo, r.nextInt(15) + 10)));
+                {
+                    String[] response = new Client()
+                            .communicate(loadBalancerInfo, r.nextInt(MAX_RANDOM) + MIN_NUM)
+                            .split(":");
+
+                    System.out.println("At Client side");
+                    for(String s : response) {
+                        System.out.println(s);
+                    }
+                });
             }
         } catch (Exception e) {
             System.err.println("In ClientMain: " + e.getMessage());
