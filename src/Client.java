@@ -15,16 +15,20 @@ class Client {
         Socket s = null;
         try {
             s = new Socket(serverInfo.getServerIP(), serverInfo.getPort());
-
+            PrintStream printStream = new PrintStream(s.getOutputStream());
+            Scanner scanner = new Scanner(s.getInputStream());
             // Sending message to server
             Print.out(message, serverInfo.getPort());
 
-            new PrintStream(s.getOutputStream()).println(message);
+            printStream.println(message);
 
             // Receive a reply from the server
-            String reply = new Scanner(s.getInputStream()).nextLine();
+            String reply = scanner.nextLine();
 
             Print.out("Reply: " + reply);
+
+            printStream.close();
+            scanner.close();
 
             return reply;
         } catch (Exception e) {

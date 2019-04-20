@@ -38,13 +38,18 @@ class Server implements Runnable {
     public void run() {
         try {
             // Read in the number sent by the client
-            long data = new Scanner(clientSocket.getInputStream()).nextInt();
+            PrintStream printStream = new PrintStream(clientSocket.getOutputStream());
+            Scanner scanner = new Scanner(clientSocket.getInputStream());
+            long data = scanner.nextInt();
 //            Print.out("Number from client: " + data);
             String result = app.start(data);
-//            Print.out(app.type() + " says " + result);
+            Print.out(app.type() + " says result = " + result);
 
             // Send back the result to the client
-            new PrintStream(clientSocket.getOutputStream()).println(machineName + ":" + result);
+            printStream.println(machineName + ":" + result);
+
+            scanner.close();
+            printStream.close();
         } catch (Exception e) {
             System.err.println("In start: " + e.getMessage());
         } finally {
