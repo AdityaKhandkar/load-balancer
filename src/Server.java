@@ -15,16 +15,17 @@ class Server implements Runnable {
     private int listenForClientPort;
     private String machineName;
 
-    public static final int THREAD_LIMIT = 2;
+    public int THREAD_LIMIT;
 
-    public Server(int listenForClientPort, Application app) {
-        this(listenForClientPort, new Socket(), app);
+    public Server(int listenForClientPort, int threads, Application app) {
+        this(listenForClientPort, threads, new Socket(), app);
     }
 
-    private Server(int listenForClientPort, Socket socket, Application app) {
+    private Server(int listenForClientPort, int threads, Socket socket, Application app) {
 
         this.listenForClientPort = listenForClientPort;
         clientSocket = socket;
+        THREAD_LIMIT = threads;
         this.app = app;
 
         try {
@@ -34,15 +35,27 @@ class Server implements Runnable {
         }
     }
 
+    public void setNumOfThreads(int threads) {
+        THREAD_LIMIT = threads;
+    }
+
+    public int getNumOfThreads() {
+        return THREAD_LIMIT;
+    }
+
     @Override
     public void run() {
         try {
             // Read in the number sent by the client
             PrintStream printStream = new PrintStream(clientSocket.getOutputStream());
             Scanner scanner = new Scanner(clientSocket.getInputStream());
+
             long data = scanner.nextInt();
-//            Print.out("Number from client: " + data);
+
+            Print.out("Number from client: " + data);
+
             String result = app.start(data);
+
             Print.out(app.type() + " says result = " + result);
 
             // Send back the result to the client
@@ -69,6 +82,8 @@ class Server implements Runnable {
             System.out.println("Application: " + app.type());
 
             Socket socket;
+
+
             ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(THREAD_LIMIT);
 
             while(true) {
@@ -78,7 +93,7 @@ class Server implements Runnable {
                     socket = serverSocket.accept();
                     System.out.println("Client connected");
 
-                    pool.execute(new Server(listenForClientPort, socket, app));
+                    pool.execute(new Server(listenForClientPort, THREAD_LIMIT, socket, app));
 
 //                    System.out.println("Threads which completed their tasks: " + pool.getCompletedTaskCount());
 //                    System.out.printf("Active threads in %s: %d \n", machineName, pool.getActiveCount());

@@ -20,8 +20,8 @@ public class ClientMain {
         Random r = new Random();
 
         ServerInfo loadBalancerInfo = new ServerInfo(sunLabLoadBalancerAddress, loadBalancerPort);
-
-        ExecutorService pool = Executors.newFixedThreadPool(ServerMain.NUM_SERVERS * Server.THREAD_LIMIT);
+        System.out.println("lol");
+        ExecutorService pool = Executors.newFixedThreadPool(Config.CL_THREAD_LIMIT);
 
         try {
             while(true) {

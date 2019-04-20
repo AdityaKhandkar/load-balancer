@@ -2,6 +2,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Collections;
 
 /**
  * Created by Aditya on 3/25/2019.
@@ -21,12 +22,12 @@ public class LoadBalancerMain {
 
         // List of servers
         String serverAddressPrefix = ".cs.hbg.psu.edu";
-        List<String> serversAddresses = new ArrayList<>(Arrays.asList("grace", "dijkstra", "noyce"));
-//                                                                      "nygaard", "euclid", "euler",
-//                                                                      "gauss", "riemann", "babbage"));
-        List<Integer> serverPorts = new ArrayList<>(Arrays.asList(6151, 6152, 6153));
-//                                                                  6154, 6155, 6156,
-//                                                                  6157, 6158, 6159));
+
+        List<String> serversAddresses = new ArrayList<String>(Config.servers.length);
+        Collections.addAll(serversAddresses, Config.servers);
+
+        List<Integer> serverPorts = new ArrayList<>(Config.listenForClientPorts.length);
+        Collections.addAll(serverPorts, Config.listenForClientPorts);
 
         List<ServerInfo> servers = new ArrayList<>();
 
@@ -43,7 +44,7 @@ public class LoadBalancerMain {
         }
 
         try {
-            new Server(clientPort, new LoadBalancer(servers, new Client())).start();
+            new Server(clientPort, Config.LB_THREAD_LIMIT, new LoadBalancer(servers, new Client())).start();
         } catch (Exception e) {
             System.err.println("In LoadBalancerMain: " + e.getMessage());
         }
