@@ -4,22 +4,21 @@
 
 class ServerStatus implements Comparable {
 
-    private final int MAX_THREADS = 10;
     private int availableThreads;
     private ServerInfo serverInfo;
 
     public ServerStatus(ServerInfo serverInfo) {
         this.serverInfo = serverInfo;
-        availableThreads = MAX_THREADS;
+        availableThreads = Config.SERVER_THREAD_LIMIT;
     }
 
     public ServerInfo getServerInfo() {
         return serverInfo;
     }
 
-    public synchronized void setAvailableThreads(int t) {
-        if(t > 10) availableThreads = MAX_THREADS;
-        else availableThreads = t;
+    public synchronized void setAvailableThreads(int threads) {
+        if(threads > Config.SERVER_THREAD_LIMIT) availableThreads = Config.SERVER_THREAD_LIMIT;
+        else availableThreads = threads;
     }
 
     public synchronized int getAvailableThreads() {

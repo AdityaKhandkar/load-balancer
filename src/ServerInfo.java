@@ -3,10 +3,12 @@
  */
 class ServerInfo {
     private String serverIP;
+    private String serverName;
     private int port;
 
     public ServerInfo(String serverIP, int port) {
         this.serverIP = serverIP;
+        this.serverName = serverIP.split("\\.")[0];
         this.port = port;
     }
 
@@ -32,7 +34,7 @@ class ServerInfo {
 
     @Override
     public String toString() {
-        return this.serverIP     + " " + this.port;
+        return this.serverName + " " + this.port;
     }
 
     @Override

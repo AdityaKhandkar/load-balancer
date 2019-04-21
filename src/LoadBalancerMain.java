@@ -3,6 +3,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Collections;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by Aditya on 3/25/2019.
@@ -23,13 +24,13 @@ public class LoadBalancerMain {
         // List of servers
         String serverAddressPrefix = ".cs.hbg.psu.edu";
 
-        List<String> serversAddresses = new ArrayList<String>(Config.servers.length);
+        List<String> serversAddresses = new CopyOnWriteArrayList<>();
         Collections.addAll(serversAddresses, Config.servers);
 
-        List<Integer> serverPorts = new ArrayList<>(Config.listenForClientPorts.length);
+        List<Integer> serverPorts = new CopyOnWriteArrayList<>();
         Collections.addAll(serverPorts, Config.listenForClientPorts);
 
-        List<ServerInfo> servers = new ArrayList<>();
+        CopyOnWriteArrayList<ServerInfo> servers = new CopyOnWriteArrayList<>();
 
         ListIterator<String> addrIter;
         ListIterator<Integer> portIter;

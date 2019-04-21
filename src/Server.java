@@ -5,6 +5,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -35,14 +36,6 @@ class Server implements Runnable {
         }
     }
 
-    public void setNumOfThreads(int threads) {
-        THREAD_LIMIT = threads;
-    }
-
-    public int getNumOfThreads() {
-        return THREAD_LIMIT;
-    }
-
     @Override
     public void run() {
         try {
@@ -50,7 +43,7 @@ class Server implements Runnable {
             PrintStream printStream = new PrintStream(clientSocket.getOutputStream());
             Scanner scanner = new Scanner(clientSocket.getInputStream());
 
-            long data = scanner.nextInt();
+            int data = scanner.nextInt();
 
             Print.out("Number from client: " + data);
 
@@ -63,13 +56,13 @@ class Server implements Runnable {
 
             scanner.close();
             printStream.close();
-        } catch (Exception e) {
-            System.err.println("In start: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("In Server run: " + e.getMessage());
         } finally {
             try {
                 clientSocket.close();
             } catch (IOException e) {
-                System.err.println("In finally: " + e.getMessage());
+                System.err.println("In Server finally: " + e.getMessage());
             }
 //            Print.out("Connection with client closed.");
         }
@@ -83,26 +76,25 @@ class Server implements Runnable {
 
             Socket socket;
 
-
             ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(THREAD_LIMIT);
 
             while(true) {
-                try {
+                if(pool.getActiveCount() < Config.SERVER_THREAD_LIMIT) {
                     System.out.println("Waiting for the client to connect...");
 
                     socket = serverSocket.accept();
+
                     System.out.println("Client connected");
 
                     pool.execute(new Server(listenForClientPort, THREAD_LIMIT, socket, app));
 
-//                    System.out.println("Threads which completed their tasks: " + pool.getCompletedTaskCount());
-//                    System.out.printf("Active threads in %s: %d \n", machineName, pool.getActiveCount());
-                } catch(Exception e) {
-                    System.err.println("In while: " + e.getMessage());
+                    System.out.println("Threads which completed their tasks: " + pool.getCompletedTaskCount());
+
+                    System.out.printf("Active threads in %s: %d \n", machineName, pool.getActiveCount());
                 }
             }
-        } catch (Exception e) {
-            System.err.println("In start: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("In Server start: " + e.getMessage());
         }
     }
 }

@@ -3,5 +3,5 @@
  */
 interface Application {
     String type();
-    String start(long num);
+    String start(int num);
 }

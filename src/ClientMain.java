@@ -20,22 +20,23 @@ public class ClientMain {
         Random r = new Random();
 
         ServerInfo loadBalancerInfo = new ServerInfo(sunLabLoadBalancerAddress, loadBalancerPort);
-        System.out.println("lol");
-        ExecutorService pool = Executors.newFixedThreadPool(Config.CL_THREAD_LIMIT);
+        ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(Config.CL_THREAD_LIMIT);
 
         try {
             while(true) {
-                pool.execute(() ->
-                {
-                    String[] response = new Client()
-                            .communicate(loadBalancerInfo, r.nextInt(MAX_RANDOM) + MIN_NUM)
-                            .split(":");
+                if(pool.getActiveCount() < Config.CL_THREAD_LIMIT) {
+                    pool.execute(() ->
+                    {
+                        String[] response = new Client()
+                                .communicate(loadBalancerInfo, r.nextInt(MAX_RANDOM) + MIN_NUM)
+                                .split(":");
 
-                    System.out.println("At Client side");
-                    for(String s : response) {
-                        System.out.println(s);
-                    }
-                });
+                        System.out.println("At Client side");
+                        for(String s : response) {
+                            System.out.println(s);
+                        }
+                    });
+                }
             }
         } catch (Exception e) {
             System.err.println("In ClientMain: " + e.getMessage());
