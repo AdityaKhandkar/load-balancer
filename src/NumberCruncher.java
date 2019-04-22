@@ -22,15 +22,25 @@ class NumberCruncher implements Application {
     }
 
     private int randomNumberCruncher(int num) {
+        int sleepTime = new Random().nextInt(num);
+
         if(num % 2 == 0) {
-            sleep(new Random().nextInt(num) + (num / 2));
+            sleepTime /= 2;
+        } else if (num % 3 == 0) {
+            sleepTime /= 3;
+        } else if (num % 5 == 0) {
+            sleepTime /= 5;
+        } else if (num % 7 == 0) {
+            sleepTime /= 7;
         }
+
+        sleep(sleepTime * 250);
+
         return findNthFib(num);
     }
 
     private void sleep(long millis) {
         try {
-            Print.out("Going to sleep.");
             Thread.sleep(millis);
         } catch (InterruptedException e) {
             System.err.println("In Number Cruncher: " + e.getMessage());

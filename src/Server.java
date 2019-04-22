@@ -49,7 +49,7 @@ class Server implements Runnable {
 
             String result = app.start(data);
 
-            Print.out(app.type() + " says result = " + result);
+            Print.out(app.type() + " returned: " + result);
 
             // Send back the result to the client
             printStream.println(machineName + ":" + result);
@@ -70,9 +70,9 @@ class Server implements Runnable {
 
     public void start() {
         try(ServerSocket serverSocket = new ServerSocket(listenForClientPort)) {
-            System.out.println("On " + machineName);
-            System.out.println("Listening on port: " + listenForClientPort);
-            System.out.println("Application: " + app.type());
+//            System.out.println("On " + machineName);
+//            System.out.println("Listening on port: " + listenForClientPort);
+//            System.out.println("Application: " + app.type());
 
             Socket socket;
 
@@ -88,9 +88,9 @@ class Server implements Runnable {
 
                     pool.execute(new Server(listenForClientPort, THREAD_LIMIT, socket, app));
 
-                    System.out.println("Threads which completed their tasks: " + pool.getCompletedTaskCount());
+//                    System.out.println("Threads which completed their tasks: " + pool.getCompletedTaskCount());
 
-                    System.out.printf("Active threads in %s: %d \n", machineName, pool.getActiveCount());
+//                    System.out.printf("Active threads in %s: %d \n", machineName, pool.getActiveCount());
                 }
             }
         } catch (IOException e) {

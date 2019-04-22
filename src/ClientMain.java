@@ -19,22 +19,23 @@ public class ClientMain {
 
         Random r = new Random();
 
+        // Initialize the ThreadPoolExecutor
         ServerInfo loadBalancerInfo = new ServerInfo(sunLabLoadBalancerAddress, loadBalancerPort);
         ThreadPoolExecutor pool = (ThreadPoolExecutor) Executors.newFixedThreadPool(Config.CL_THREAD_LIMIT);
 
+
+        // Send requests to the load balancer until the thread limit and then store
+        // a few requests in the queue.
         try {
             while(true) {
-                if(pool.getActiveCount() < Config.CL_THREAD_LIMIT) {
+                if(pool.getActiveCount() < Config.CL_THREAD_LIMIT + Config.CL_THREAD_LIMIT / 2) {
                     pool.execute(() ->
                     {
                         String[] response = new Client()
                                 .communicate(loadBalancerInfo, r.nextInt(MAX_RANDOM) + MIN_NUM)
                                 .split(":");
 
-                        System.out.println("At Client side");
-                        for(String s : response) {
-                            System.out.println(s);
-                        }
+                        Print.out(response[1] + " sent: " + response[2]);
                     });
                 }
             }

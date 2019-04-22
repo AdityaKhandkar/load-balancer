@@ -25,7 +25,7 @@ class Client {
             // Receive a reply from the server
             String reply = scanner.nextLine();
 
-            Print.out("Reply: " + reply);
+//            Print.out("Reply from LB: " + reply);
 
             printStream.close();
             scanner.close();

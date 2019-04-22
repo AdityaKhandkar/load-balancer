@@ -35,6 +35,15 @@ class ServerStatus implements Comparable {
     }
 
     @Override
+    public synchronized boolean equals(Object o) {
+        if(o instanceof ServerStatus) {
+            ServerStatus that = (ServerStatus) o;
+            return this.serverInfo.equals(that.serverInfo);
+        }
+        return false;
+    }
+
+    @Override
     public synchronized String toString() {
         return serverInfo.toString() + ", " + availableThreads;
     }
