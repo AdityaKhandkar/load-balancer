@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.io.PrintStream;
 import java.math.BigInteger;
 import java.net.Socket;
@@ -17,6 +18,7 @@ class Client {
             s = new Socket(serverInfo.getServerIP(), serverInfo.getPort());
             PrintStream printStream = new PrintStream(s.getOutputStream());
             Scanner scanner = new Scanner(s.getInputStream());
+
             // Sending message to server
             Print.out(message, serverInfo.getPort());
 
@@ -25,21 +27,31 @@ class Client {
             // Receive a reply from the server
             String reply = scanner.nextLine();
 
-//            Print.out("Reply from LB: " + reply);
-
             printStream.close();
             scanner.close();
 
             return reply;
-        } catch (Exception e) {
+        } catch (IOException e) {
+
             Print.out("In communicate: " + e.getMessage());
-        } finally { // Always close the socket
+
+            String out = "Load balancer down.\nGiving it a chance to get back online.\nGoing to sleep for 10 seconds...";
+
+            Print.out(out);
+
+            try {
+                Thread.sleep(10*1000);
+            } catch (InterruptedException i) {
+                System.out.println("In communicate catch, can't sleep: " + i.getMessage());
+            }
+
+            return EXCEPTION;
+        } finally {
             try {
                 s.close();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 Print.out("In communicate-finally: " + e.getMessage());
             }
         }
-        return EXCEPTION;
     }
 }

@@ -1,3 +1,5 @@
+
+
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -49,8 +51,7 @@ class LoadBalancer implements Application {
                 serverStatus.setAvailableThreads(availableThreads - 1);
 
                 // Add the serverStatus back into the heap
-                if(!status.contains(serverStatus))
-                    status.add(serverStatus);
+                status.add(serverStatus);
 
                 Print.out("Sending load to " + name);
 
@@ -58,11 +59,8 @@ class LoadBalancer implements Application {
 
                 // Reheapify
                 status.remove(serverStatus);
-
                 serverStatus.setAvailableThreads(availableThreads + 1);
-
-                if(!status.contains(serverStatus))
-                    status.add(serverStatus);
+                status.add(serverStatus);
 
                 return response;
             }
@@ -74,7 +72,7 @@ class LoadBalancer implements Application {
         return Client.EXCEPTION + " All servers busy. Please try again later.";
     }
 
-
+    // Get the next available server
     private synchronized ServerStatus getNextAvailableServer() {
         if (status.peek().getAvailableThreads() > 0) return status.poll();
         return null;

@@ -1,6 +1,9 @@
 /**
  * Created by Aditya on 3/21/2019.
+ *
+ * Class to store a server's information.
  */
+
 class ServerInfo {
     private String serverIP;
     private String serverName;
@@ -9,14 +12,6 @@ class ServerInfo {
     public ServerInfo(String serverIP, int port) {
         this.serverIP = serverIP;
         this.serverName = serverIP.split("\\.")[0];
-        this.port = port;
-    }
-
-    public void setServerIP(String serverIP) {
-        this.serverIP = serverIP;
-    }
-
-    public void setPort(int port) {
         this.port = port;
     }
 

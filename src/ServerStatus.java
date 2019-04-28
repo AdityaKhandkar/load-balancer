@@ -1,5 +1,7 @@
 /**
  * Created by Aditya on 4/14/2019.
+ *
+ * Class to store the status of a server.
  */
 
 class ServerStatus implements Comparable {

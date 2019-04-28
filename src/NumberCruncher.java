@@ -42,7 +42,8 @@ class NumberCruncher implements Application {
         }
     }
 
-    // Inefficient fibonacci function
+    // Inefficient fibonacci function.
+    // This makes the server take a little more time.
     private int findNthFib(int n) {
         if(n <= 1) return n;
         return findNthFib(n - 1) + findNthFib(n - 2);

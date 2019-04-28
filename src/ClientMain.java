@@ -9,8 +9,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class ClientMain {
     public static void main(String[] args) {
-        String localhost = "localhost";
-        String loadBalancerAddress = localhost;
 
         String sunLabLoadBalancerAddress = "ada.hbg.psu.edu";
         final int loadBalancerPort = 6150;
@@ -28,16 +26,35 @@ public class ClientMain {
         // a few requests in the queue.
         try {
             while(true) {
-                if(pool.getActiveCount() < Config.CL_THREAD_LIMIT + Config.CL_THREAD_LIMIT / 2) {
+                if(pool.getActiveCount() < Config.CL_THREAD_LIMIT) {
                     pool.execute(() ->
                     {
                         int rand = r.nextInt(MAX_RANDOM) + MIN_NUM;
-                        String[] response = new Client()
-                                .communicate(loadBalancerInfo, rand)
-                                .split(":");
 
-                        Print.out("The message is from: " + response[1] + "\n");
-                        Print.out("Fibonacci #" + rand + " = " + response[2]);
+                        String response = new Client()
+                                .communicate(loadBalancerInfo, rand);
+
+                        // If you get a correct response, display it.
+                        if(response.contains(":")) {
+                            String[] responseArray = response.split(":");
+
+                            String output = "The message is from: " + responseArray[1] + "\n"
+                                    + "Fibonacci #" + rand + " = " + responseArray[2];
+
+                            Print.out(output);
+                        }
+
+                        // If all servers are full, give them a chance to finish their work.
+                        if(response.contains(Client.EXCEPTION)) {
+                            Print.out(response);
+                            Print.out("Going to sleep...");
+                            try {
+                                Thread.sleep(10*1000);
+                            } catch (InterruptedException e) {
+                                System.out.println("In ClientMain if-catch, can't sleep: " + e.getMessage());
+                            }
+                        }
+
                     });
                 }
             }
