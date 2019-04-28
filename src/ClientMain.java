@@ -31,11 +31,13 @@ public class ClientMain {
                 if(pool.getActiveCount() < Config.CL_THREAD_LIMIT + Config.CL_THREAD_LIMIT / 2) {
                     pool.execute(() ->
                     {
+                        int rand = r.nextInt(MAX_RANDOM) + MIN_NUM;
                         String[] response = new Client()
-                                .communicate(loadBalancerInfo, r.nextInt(MAX_RANDOM) + MIN_NUM)
+                                .communicate(loadBalancerInfo, rand)
                                 .split(":");
 
-                        Print.out(response[1] + " sent: " + response[2]);
+                        Print.out("The message is from: " + response[1] + "\n");
+                        Print.out("Fibonacci #" + rand + " = " + response[2]);
                     });
                 }
             }

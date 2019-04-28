@@ -1,4 +1,3 @@
-import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.PriorityBlockingQueue;
 
@@ -23,7 +22,6 @@ class LoadBalancer implements Application {
         status = new PriorityBlockingQueue<>(servers.size(),
                 (t1, t2) -> t2.getAvailableThreads() - t1.getAvailableThreads());
         servers.forEach(s -> status.add(new ServerStatus(s)));
-//        System.out.println("In load balancer loadServerStatus: " + servers);
     }
 
     // Load balancing algorithm
@@ -37,16 +35,12 @@ class LoadBalancer implements Application {
 
             if(serverStatus == null) {
                 try {
-//                    Print.out("Going to sleep.");
                     Thread.sleep(500);
                 } catch (InterruptedException e) {
                     System.err.println("In LB Start, can't sleep: " + e.getMessage());
                 }
-//                Print.out("Please wait. A server should be with you shortly.");
-
+                Print.out("Please wait. A server should be with you shortly.");
             } else {
-
-//                System.out.println("Status: " + serverStatus);
 
                 int availableThreads = serverStatus.getAvailableThreads();
 
@@ -55,34 +49,26 @@ class LoadBalancer implements Application {
                 serverStatus.setAvailableThreads(availableThreads - 1);
 
                 // Add the serverStatus back into the heap
-//                if(!status.contains(serverStatus))
+                if(!status.contains(serverStatus))
                     status.add(serverStatus);
 
                 Print.out("Sending load to " + name);
 
-                // Testing
-//                Print.out("Status before response: " + status.toString());
-
                 String response = client.communicate(serverStatus.getServerInfo(), msg);
-
-                // Testing
-//                Print.out("Status after response: " + status.toString());
 
                 // Reheapify
                 status.remove(serverStatus);
 
                 serverStatus.setAvailableThreads(availableThreads + 1);
 
-//                if(!status.contains(serverStatus))
+                if(!status.contains(serverStatus))
                     status.add(serverStatus);
-
-//                Print.out("Response from server: " + response);
 
                 return response;
             }
         }
 
-//        Print.out("All servers are busy. Please  try again later");
+        Print.out("All servers are busy. Please try again later");
 
         // If all servers are currently busy, restart the process.
         return Client.EXCEPTION + " All servers busy. Please try again later.";
